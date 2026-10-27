@@ -1,6 +1,11 @@
 name: Update Japanese stock data
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/update.yml'
+      - 'update.py'
+      - 'requirements.txt'
   schedule:
     - cron: '35 7 * * 1-5'
 
