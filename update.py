@@ -37,7 +37,7 @@ for offset in range(0, len(universe), 60):
     tickers = [code + ".T" for code, _, _ in part]
     try:
         hist = yf.download(tickers, period="ytd", interval="1d", auto_adjust=False,
-                           group_by="ticker", threads=False, progress=False, timeout=12)
+                           group_by="ticker", threads=True, progress=False, timeout=20)
         for code, name, market in part:
             try:
                 h = hist[tickers[part.index((code,name,market))]] if isinstance(hist.columns, pd.MultiIndex) else hist
