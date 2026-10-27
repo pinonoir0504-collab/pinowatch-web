@@ -6,13 +6,13 @@ from pathlib import Path
 import pandas as pd
 import yfinance as yf
 
-JPX = "https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls"
+JPX = "https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xlsx"
 OUT = Path("data/latest.json")
 OUT.parent.mkdir(exist_ok=True)
 jst = dt.timezone(dt.timedelta(hours=9))
 now = dt.datetime.now(jst)
 def fetch_universe():
-    df = pd.read_excel(JPX)
+    df = pd.read_excel(JPX, engine='openpyxl', dtype={'コード': str})
     df.columns = [str(x).strip() for x in df.columns]
     code_col = next(c for c in df if "コード" in c)
     name_col = next(c for c in df if "銘柄名" in c)
