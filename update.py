@@ -30,12 +30,14 @@ universe = fetch_universe()
 rows = []
 errors = []
 # Batch downloads avoid one HTTP request per symbol.
+print(f"Universe: {len(universe)} symbols", flush=True)
 for offset in range(0, len(universe), 60):
+    print(f"Fetching {offset+1}-{min(offset+60,len(universe))}/{len(universe)}", flush=True)
     part = universe[offset:offset+60]
     tickers = [code + ".T" for code, _, _ in part]
     try:
         hist = yf.download(tickers, period="ytd", interval="1d", auto_adjust=False,
-                           group_by="ticker", threads=True, progress=False, timeout=30)
+                           group_by="ticker", threads=False, progress=False, timeout=12)
         for code, name, market in part:
             try:
                 h = hist[tickers[part.index((code,name,market))]] if isinstance(hist.columns, pd.MultiIndex) else hist
@@ -54,7 +56,8 @@ for offset in range(0, len(universe), 60):
                         "dividendYield":None})
             except Exception as e: errors.append(code + ": " + str(e)[:100])
     except Exception as e: errors.append("batch " + str(offset) + ": " + str(e)[:120])
-    time.sleep(1)
+    print(f"Completed batch; matches={len(rows)}, errors={len(errors)}", flush=True)
+    time.sleep(0.2)
 # Do not publish an empty snapshot, or pretend missing data is a zero-result day.
 if not rows: raise RuntimeError("No price rows fetched; existing data remains untouched. " + "; ".join(errors[:3]))
 latest_date = max(x["date"] for x in rows)
